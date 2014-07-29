@@ -20,12 +20,12 @@ function change_hostname {
 	# `&> /dev/null` to suppress this message: "sudo: unable to resolve host"
 }
 
-change_hostname 'vagrant-ubuntu'
-update_apt
-install vim-nox
-install curl
-install git
-install htop
-install tree
-install python-pip
-install ipython
+sudo apt-get install -y python-software-properties
+sudo add-apt-repository ppa:gearman-developers/ppa -y
+sudo apt-get update
+sudo apt-get install -y gearman-job-server
+sudo apt-get install -y python
+sudo apt-get install -y python-pip
+sudo apt-get install vim-nox
+
+sudo pip install gearman
