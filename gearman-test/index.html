@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Gearman Background Job</title>
+</head>
+<body>
+
+<button type="button">Work</button>
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+
+function wait(secs) {
+	return $.get('/wait/' + secs)
+}
+
+function jobStatus(jobID) {
+	return $.get('/job/' + jobID);
+}
+
+/** 
+ * Generic XHR error callback.
+ */
+function error(xhr, status, error) {
+	console.log(arguments);
+}
+
+/**
+ * Poll for the status of a background job and call the `update` callback with
+ * the results.
+ * @param  {String} jobID - The background job handle.
+ * @param  {Function} update - An ajax success callback.
+ * @param  {Number} interval - Number of miliseconds. Given to setInterval.
+ * @return {Number} An interval id which can be used to cancel the interval.
+ */
+function pollJobStatus(jobID, update, interval) {
+	var intervalID,
+		interval = interval || 1000;
+	
+	var clearInterval = function (status) {
+		if (!status.known && !status.running) {
+			console.log('stopping interval: ', status)
+			window.clearInterval(intervalID)
+		}
+	};
+	
+	var statusUpdate = function () {
+		jobStatus(jobID)
+			.done(update)
+			.done(clearInterval)
+			.fail(error);
+	};
+
+	intervalID = setInterval(statusUpdate, interval);
+	return intervalID;
+}
+
+function updateProgressBar(status) {
+	$('progress').attr({value: status.numerator, max: status.denominator})
+}
+
+function pollAndUpdateProgressBar(jobID) {
+	pollJobStatus(jobID, updateProgressBar);
+}
+
+$('button').on('click', function () {
+	$('button').replaceWith('<progress>');
+	wait(15).then(pollAndUpdateProgressBar, error);
+});
+
+</script>
+</body>
+</html>

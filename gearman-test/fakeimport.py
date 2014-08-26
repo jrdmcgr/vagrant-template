@@ -1,5 +1,8 @@
 import json
+import logging
 import time
+
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
 
 
 def count_records(data, count=0):
@@ -28,7 +31,7 @@ def count_records(data, count=0):
 
 def fake_work():
     """Pretend to do some intensive work."""
-    time.sleep(0.2)
+    time.sleep(1)
 
 
 class FakeImport(object):
@@ -69,14 +72,14 @@ class FakeImport(object):
         self.update_status()
 
     def import_data(self):
-        print "Processing %s records" % self.count
+        logging.info("Processing %s records", self.count)
         if isinstance(self.data, list):
             self.process_list(self.data)
         elif isinstance(self.data, dict):
             self.process_dict(self.data)
         else:
             raise TypeError('Unprocessable Entity %s' % self.data)
-        print '\nDONE!'
+        logging.info('DONE!')
 
 
 if __name__ == '__main__':
